@@ -17,6 +17,21 @@ class Tile {
         // Устанавливаем hitArea
         this.sprite.setInteractive();
     }
+
+    remove() {
+        // Анимация удаления
+        this.scene.tweens.add({
+            targets: this.sprite,
+            scaleX: 0,
+            scaleY: 0,
+            alpha: 0,
+            duration: 500,
+            ease: 'Power2',
+            onComplete: () => {
+                this.sprite.destroy(); // Удаляем спрайт после завершения анимации
+            }
+        });
+    }
 }
 
 export default Tile;

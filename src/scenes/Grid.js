@@ -29,6 +29,34 @@ class Grid {
 
         return grid;
     }
+
+    getGroupTiles(x, y) {
+        const tilesToCheck = [{ x, y }];
+        const tilesToRemove = [];
+        const color = this.grid[y][x].color;
+
+        while (tilesToCheck.length > 0) {
+            const { x, y } = tilesToCheck.pop();
+
+            if (x >= 0 && x < this.cols && y >= 0 && y < this.rows && this.grid[y][x] && this.grid[y][x].color === color && !tilesToRemove.some(t => t.x === x && t.y === y)) {
+                tilesToRemove.push({ x, y });
+                tilesToCheck.push({ x: x + 1, y });
+                tilesToCheck.push({ x: x - 1, y });
+                tilesToCheck.push({ x, y: y + 1 });
+                tilesToCheck.push({ x, y: y - 1 });
+            }
+        }
+
+        return tilesToRemove;
+    }
+
+    removeTiles(tiles) {
+        tiles.forEach(tile => {
+            const { x, y } = tile;
+            this.grid[y][x].remove();
+            this.grid[y][x] = null;
+        });
+    }
 }
 
 export default Grid;
