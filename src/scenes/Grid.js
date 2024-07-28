@@ -56,6 +56,47 @@ class Grid {
             this.grid[y][x].remove();
             this.grid[y][x] = null;
         });
+
+        this.scene.time.delayedCall(500, () => this.fillEmptySpaces());
+    }
+
+    fillEmptySpaces() {
+        for (let x = 0; x < this.cols; x++) {
+            let emptySpace = 0;
+
+            for (let y = this.rows - 1; y >= 0; y--) {
+                if (this.grid[y][x] === null) {
+                    emptySpace++;
+                } else if (emptySpace > 0) {
+                    const tile = this.grid[y][x];
+                    this.grid[y][x] = null;
+                    this.grid[y + emptySpace][x] = tile;
+
+                    this.scene.tweens.add({
+                        targets: tile.sprite,
+                        y: tile.sprite.y + emptySpace * this.tileSize,
+                        duration: 500,
+                        ease: 'Power2'
+                    });
+
+                    tile.y += emptySpace;
+                }
+            }
+
+            for (let i = 0; i < emptySpace; i++) {
+                const color = this.colors[Math.floor(Math.random() * this.colors.length)];
+                const newTile = new Tile(this.scene, x, i - emptySpace, this.tileSize, color);
+                this.grid[i][x] = newTile;
+                this.container.add(newTile.sprite);
+
+                this.scene.tweens.add({
+                    targets: newTile.sprite,
+                    y: newTile.sprite.y + emptySpace * this.tileSize,
+                    duration: 500,
+                    ease: 'Power2'
+                });
+            }
+        }
     }
 }
 
