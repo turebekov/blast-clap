@@ -1,19 +1,13 @@
 import Phaser from 'phaser';
 import Game from './scenes/Game.js';
-import Score from './scenes/Score.js'
+import LossScene from './scenes/LossScene.js'
+import WinScene from './scenes/WinScene.js'
 
 const config = {
     type: Phaser.AUTO,
-    width: 800,
+    width: 1000,
     height: 600,
-    scene: [Game],
-    physics: {
-        default: 'arcade',
-        arcade: {
-            gravity: {y: 0},
-            debug: false
-        }
-    }
+    scene: [Game, WinScene, LossScene]
 };
 
 const game = new Phaser.Game(config);

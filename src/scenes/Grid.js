@@ -33,6 +33,9 @@ class Grid {
     getGroupTiles(x, y) {
         const tilesToCheck = [{ x, y }];
         const tilesToRemove = [];
+        if (!this.grid[y][x]) {
+            return ;
+        }
         const color = this.grid[y][x].color;
 
         while (tilesToCheck.length > 0) {
@@ -57,7 +60,7 @@ class Grid {
             this.grid[y][x] = null;
         });
 
-        this.scene.time.delayedCall(500, () => this.fillEmptySpaces());
+        this.scene.time.delayedCall(100, () => this.fillEmptySpaces());
     }
 
     fillEmptySpaces() {
