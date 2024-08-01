@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import Game from './scenes/Game.js';
+import Game from './scenes/GameScene/Game.js';
 import LossScene from './scenes/LossScene.js'
 import WinScene from './scenes/WinScene.js'
 
