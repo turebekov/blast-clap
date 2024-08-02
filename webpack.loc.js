@@ -7,7 +7,7 @@ module.exports = {
     mode: "development",
     devtool: "eval-cheap-source-map",
     output: {
-        clean: true, // Clean the output directory before emit
+        clean: true,
         path: path.resolve(__dirname, "dist"),
     },
     module: {
@@ -29,7 +29,7 @@ module.exports = {
     plugins: [
         new CopyPlugin({
             patterns: [
-                { // не копируем изображения в папках
+                {
                     from: "src/assets/images/*",
                     to: "assets/images/[name][ext]"
                 },
@@ -49,6 +49,6 @@ module.exports = {
         port: 9000,
         open: true,
         hot: true,
-        watchFiles: ['src/**/*'] // Наблюдение за изменениями в src
+        watchFiles: ['src/**/*']
     }
 }
