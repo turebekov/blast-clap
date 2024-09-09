@@ -1,21 +1,16 @@
 import Phaser from 'phaser';
 import Grid from './Grid.js';
-import {GAME_CONFIG} from './config.constants';
+import AssetLoader from "../../ui/AssetLoader";
+import {GAME_CONFIG} from '../../shared/constants/config.constants';
 
 export default class Game extends Phaser.Scene {
     constructor() {
         super({ key: 'Game' });
+        this.assetLoader = new AssetLoader(this);
     }
 
     preload() {
-        this.load.image('green', 'assets/images/green-cube.png');
-        this.load.image('blue', 'assets/images/blue-cube.png');
-        this.load.image('red', 'assets/images/red-cube.png');
-        this.load.image('yellow', 'assets/images/yellow-cube.png');
-        this.load.image('score-background', 'assets/images/score-background.png');
-        this.load.image('game-background', 'assets/images/game-background.png');
-        this.load.image('score-ball', 'assets/images/ball.png');
-        this.load.image('bomb', 'assets/images/bomb.png');
+        this.assetLoader.loadImages();
     }
 
     create() {
