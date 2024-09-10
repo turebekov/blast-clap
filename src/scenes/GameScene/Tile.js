@@ -4,6 +4,7 @@ class Tile {
         this.x = x;
         this.y = y;
         this.size = size;
+        this.color = texture;
 
         this.sprite = this.scene.add.sprite(this.x * this.size + this.size / 2, this.y * this.size + this.size / 2, texture);
 

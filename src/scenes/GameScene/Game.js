@@ -1,7 +1,11 @@
 import Phaser from 'phaser';
 import Grid from './Grid.js';
-import AssetLoader from "../../ui/AssetLoader";
+import AssetLoader from '../../ui/AssetLoader';
+import ScoreDisplay from '../../ui/ScoreDisplay';
 import {GAME_CONFIG} from '../../shared/constants/config.constants';
+import MovesDisplay from '../../ui/MovesDisplay';
+import ShiftTilesDisplay from '../../ui/ShiftTilesDisplay';
+import BombButton from "../../ui/BombButton";
 
 export default class Game extends Phaser.Scene {
     constructor() {
@@ -17,21 +21,18 @@ export default class Game extends Phaser.Scene {
         this.initConfig();
         this.setBackgroundColorToMainCamera();
         this.createContainerWithBackground();
-        this.addScoreTextWithImage();
-        this.addShiftTilesContainer();
-        this.addBombButton();
+        this.createUIComponents();
     }
 
     initConfig() {
-        const { ROWS, COLS, TILE_SIZE, COLORS, MIN_GROUP_SIZE, MAX_MOVES, MAX_SHIFT_TILES_COUNT, TARGET_SCORE } = GAME_CONFIG;
-        this.rows = ROWS;
-        this.cols = COLS;
-        this.tileSize = TILE_SIZE;
-        this.colors = COLORS;
-        this.minGroupSize = MIN_GROUP_SIZE;
-        this.maxMoves = MAX_MOVES;
-        this.maxShiftTilesCount = MAX_SHIFT_TILES_COUNT;
-        this.targetScore = TARGET_SCORE;
+        this.rows = GAME_CONFIG.ROWS;
+        this.cols = GAME_CONFIG.COLS;
+        this.tileSize = GAME_CONFIG.TILE_SIZE;
+        this.colors = GAME_CONFIG.COLORS;
+        this.minGroupSize = GAME_CONFIG.MIN_GROUP_SIZE;
+        this.maxMoves = GAME_CONFIG.MAX_MOVES;
+        this.maxShiftTilesCount = GAME_CONFIG.MAX_SHIFT_TILES_COUNT;
+        this.targetScore = GAME_CONFIG.TARGET_SCORE;
         this.isActive = true;
 
         this.moves = 0;
@@ -58,39 +59,16 @@ export default class Game extends Phaser.Scene {
         this.input.on('pointerdown', this.grid.handleClick, this);
     }
 
-    addScoreTextWithImage() {
-        this.scoreImage = this.add.image(600, 100, 'score-background').setOrigin(0, 0);
-        this.scoreImage.setDisplaySize(300, 300);
-
-        this.scoreImageText = this.add.text(this.scoreImage.x + 150, this.scoreImage.y + 250, `${this.score}`, { fontSize: '20px', fill: '#fff' });
-        this.scoreImageText.setOrigin(0.5, 0.5);
-
-        this.movesImage = this.add.image(this.scoreImage.x + 150, this.scoreImage.y + 115, 'score-ball').setOrigin(0.5, 0.5);
-        this.movesImage.setDisplaySize(170, 160);
-
-        this.movesImageText = this.add.text(this.movesImage.x, this.movesImage.y, `${this.maxMoves - this.moves}`, { fontSize: '40px', fill: '#fff' });
-        this.movesImageText.setOrigin(0.5, 0.5);
-    }
-
-    addShiftTilesContainer() {
-        this.shiftTilesImg = this.add.image(700, 400, 'score-ball').setOrigin(0, 0);
-        this.shiftTilesImg.setDisplaySize(100, 100);
-
-        this.shiftTilesImgText = this.add.text(this.shiftTilesImg.x + 50, this.shiftTilesImg.y + 50, `${this.maxShiftTilesCount}`, { fontSize: '30px', fill: '#fff' });
-        this.shiftTilesImgText.setOrigin(0.5, 0.5);
-
-        this.shiftTilesImg.setInteractive();
-        this.shiftTilesImg.on('pointerdown', this.grid.handleShiftClick, this);
-    }
-
-    addBombButton() {
-        this.bombButton = this.add.image(850, 450, 'bomb').setInteractive();
-        this.bombButton.on('pointerdown', this.grid.activateBombBooster, this);
+    createUIComponents() {
+        this.scoreDisplay = new ScoreDisplay(this);
+        this.movesDisplay = new MovesDisplay(this, this.maxMoves);
+        this.shiftTilesDisplay = new ShiftTilesDisplay(this, this.maxShiftTilesCount);
+        this.bombButton = new BombButton(this);
     }
 
     updateUI() {
-        this.scoreImageText.setText(this.score);
-        this.movesImageText.setText(this.maxMoves - this.moves);
-        this.shiftTilesImgText.setText(this.maxShiftTilesCount - this.shiftTilesCount);
+        this.scoreDisplay.update(this.score);
+        this.movesDisplay.update(this.moves);
+        this.shiftTilesDisplay.update(this.maxShiftTilesCount - this.shiftTilesCount);
     }
 }
