@@ -1,13 +1,14 @@
 import Phaser from 'phaser';
-import Grid from './Grid.js';
-import AssetLoader from '../../ui/AssetLoader';
-import ScoreDisplay from '../../ui/ScoreDisplay';
-import {GAME_CONFIG} from '../../shared/constants/config.constants';
-import MovesDisplay from '../../ui/MovesDisplay';
-import ShiftTilesDisplay from '../../ui/ShiftTilesDisplay';
-import BombButton from "../../ui/BombButton";
+import Grid from '../ui/Grid.js';
+import AssetLoader from '../ui/AssetLoader';
+import ScoreDisplay from '../ui/ScoreDisplay';
+import {GAME_CONFIG} from '../shared/constants/config.constants';
+import MovesDisplay from '../ui/MovesDisplay';
+import ShiftTilesDisplay from '../ui/ShiftTilesDisplay';
+import BombButton from "../ui/BombButton";
+import BombBooster from "../features/BombBooster";
 
-export default class Game extends Phaser.Scene {
+export default class GameScene extends Phaser.Scene {
     constructor() {
         super({ key: 'Game' });
         this.assetLoader = new AssetLoader(this);
@@ -21,7 +22,10 @@ export default class Game extends Phaser.Scene {
         this.initConfig();
         this.setBackgroundColorToMainCamera();
         this.createContainerWithBackground();
+
+        this.initFeatures();
         this.createUIComponents();
+
     }
 
     initConfig() {
@@ -55,8 +59,28 @@ export default class Game extends Phaser.Scene {
         bgImage.setOrigin(0, 0);
 
         this.tileContainer.add(bgImage);
+
         this.grid = new Grid(this, this.rows, this.cols, this.colors, this.tileSize, this.tileContainer);
-        this.input.on('pointerdown', this.grid.handleClick, this);
+        this.input.on('pointerdown', this.handleClick, this);
+    }
+
+    handleClick(pointer) {
+        if (!this.scene.isActive) return;
+
+        const { x, y } = this.grid.getTileCoordinates.call(this, pointer);
+
+        const tilesToRemove = this.grid.getGroupTiles(x, y);
+        if (tilesToRemove && this.bombBooster.isBombActive) {
+            this.bombBooster.useBombBooster(x, y);
+            return;
+        }
+        if (tilesToRemove && tilesToRemove.length >= this.minGroupSize) {
+            this.grid.processTileRemoval(tilesToRemove);
+        }
+    }
+
+    initFeatures() {
+        this.bombBooster = new BombBooster(this);
     }
 
     createUIComponents() {

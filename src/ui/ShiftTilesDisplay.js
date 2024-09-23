@@ -11,6 +11,10 @@ export default class ShiftTilesDisplay {
         this.shiftTilesImg = this.scene.add.image(700, 400, 'score-ball').setOrigin(0, 0);
         this.shiftTilesImg.setDisplaySize(100, 100);
 
+        this.shiftTileImgHandler();
+    }
+
+    shiftTileImgHandler() {
         this.shiftTilesImg.setInteractive();
         this.shiftTilesImg.on('pointerdown', this.scene.grid.handleShiftClick, this.scene);
     }

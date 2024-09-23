@@ -9,8 +9,7 @@ class Grid {
         this.colors = colors;
         this.tileSize = tileSize;
         this.container = container;
-        this.isBombActive = false;
-        this.bombRadius = 2;
+
         this.grid = this.createGrid();
     }
 
@@ -122,24 +121,7 @@ class Grid {
         }
     }
 
-    activateBombBooster() {
-        this.grid.isBombActive = true;
-    }
 
-    handleClick(pointer) {
-        if (!this.scene.isActive) return;
-
-        const { x, y } = this.grid.getTileCoordinates.call(this, pointer);
-
-        const tilesToRemove = this.grid.getGroupTiles(x, y);
-        if (tilesToRemove && this.grid.isBombActive) {
-            this.grid.useBombBooster(x, y);
-            return;
-        }
-        if (tilesToRemove && tilesToRemove.length >= this.minGroupSize) {
-            this.grid.processTileRemoval(tilesToRemove);
-        }
-    }
 
     getTileCoordinates(pointer) {
         const localX = pointer.x - this.tileContainer.x;
@@ -192,26 +174,6 @@ class Grid {
                 tile.sprite.setTexture(color);
             }
         }
-    }
-
-    useBombBooster(x, y) {
-        this.isBombActive = false;
-        const tilesToRemove = [];
-
-        for (let i = -this.bombRadius; i <= this.bombRadius; i++) {
-            for (let j = -this.bombRadius; j <= this.bombRadius; j++) {
-                const newX = x + i;
-                const newY = y + j;
-
-                if (newX >= 0 && newX < this.cols && newY >= 0 && newY < this.rows) {
-                    tilesToRemove.push({ x: newX, y: newY });
-                }
-            }
-        }
-
-        this.scene.score += tilesToRemove.length * 10;
-        this.scene.updateUI();
-        this.removeTiles(tilesToRemove);
     }
 }
 
