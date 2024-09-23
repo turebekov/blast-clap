@@ -5,8 +5,17 @@ export default class BombBooster {
         this.bombRadius = 2;
     }
 
+    activateBombBooster() {
+        this.isBombActive = true;
+    }
+
     useBombBooster(x, y) {
         this.isBombActive = false;
+        const tilesToRemove = this.collectTilesToRemove(x, y);
+        this.updateScoreAndRemoveTiles(tilesToRemove);
+    }
+
+    collectTilesToRemove(x, y) {
         const tilesToRemove = [];
 
         for (let i = -this.bombRadius; i <= this.bombRadius; i++) {
@@ -20,12 +29,12 @@ export default class BombBooster {
             }
         }
 
+        return tilesToRemove;
+    }
+
+    updateScoreAndRemoveTiles(tilesToRemove) {
         this.scene.score += tilesToRemove.length * 10;
         this.scene.updateUI();
         this.scene.grid.removeTiles(tilesToRemove);
-    }
-
-    activateBombBooster() {
-        this.isBombActive = true;
     }
 }
