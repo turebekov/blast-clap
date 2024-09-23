@@ -16,7 +16,7 @@ export default class ShiftTilesDisplay {
 
     shiftTileImgHandler() {
         this.shiftTilesImg.setInteractive();
-        this.shiftTilesImg.on('pointerdown', this.scene.grid.handleShiftClick, this.scene);
+        this.shiftTilesImg.on('pointerdown', this.scene.shiftTile.handleShiftClick, this.scene.shiftTile);
     }
 
     addText() {

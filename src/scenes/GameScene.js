@@ -7,6 +7,7 @@ import MovesDisplay from '../ui/MovesDisplay';
 import ShiftTilesDisplay from '../ui/ShiftTilesDisplay';
 import BombButton from "../ui/BombButton";
 import BombBooster from "../features/BombBooster";
+import ShiftTile from "../features/ShiftTile";
 
 export default class GameScene extends Phaser.Scene {
     constructor() {
@@ -81,6 +82,7 @@ export default class GameScene extends Phaser.Scene {
 
     initFeatures() {
         this.bombBooster = new BombBooster(this);
+        this.shiftTile = new ShiftTile(this);
     }
 
     createUIComponents() {

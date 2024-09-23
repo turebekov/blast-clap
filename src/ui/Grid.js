@@ -150,31 +150,6 @@ class Grid {
             this.scene.scene.start('WinScene');
         }
     }
-
-    handleShiftClick() {
-        if (this.maxShiftTilesCount === this.shiftTilesCount) {
-            return;
-        }
-
-        this.scene.scene.shiftTilesCount++;
-        this.scene.scene.updateUI();
-        const colors = [];
-        for (let y = 0; y < this.rows; y++) {
-            for (let x = 0; x < this.cols; x++) {
-                colors.push(this.grid.grid[y][x].color);
-            }
-        }
-        Phaser.Utils.Array.Shuffle(colors);
-
-        for (let y = 0; y < this.rows; y++) {
-            for (let x = 0; x < this.cols; x++) {
-                const color = colors.pop();
-                const tile = this.grid.grid[y][x];
-                tile.color = color;
-                tile.sprite.setTexture(color);
-            }
-        }
-    }
 }
 
 export default Grid;
