@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import Grid from '../ui/Grid.js';
+import Grid from '../features/Grid.js';
 import AssetLoader from '../ui/AssetLoader';
 import ScoreDisplay from '../ui/ScoreDisplay';
 import {GAME_CONFIG} from '../shared/constants/config.constants';
@@ -8,6 +8,7 @@ import ShiftTilesDisplay from '../ui/ShiftTilesDisplay';
 import BombButton from "../ui/BombButton";
 import BombBooster from "../features/BombBooster";
 import ShiftTile from "../features/ShiftTile";
+import TileContainer from "../ui/TileContainer";
 
 export default class GameScene extends Phaser.Scene {
     constructor() {
@@ -22,11 +23,14 @@ export default class GameScene extends Phaser.Scene {
     create() {
         this.initConfig();
         this.setBackgroundColorToMainCamera();
-        this.createContainerWithBackground();
 
+        this.createTileContainer();
         this.initFeatures();
         this.createUIComponents();
+    }
 
+    createTileContainer() {
+        this.tileContainer = new TileContainer(this);
     }
 
     initConfig() {
@@ -49,26 +53,29 @@ export default class GameScene extends Phaser.Scene {
         this.cameras.main.setBackgroundColor('#999fa1');
     }
 
-    createContainerWithBackground() {
-        const paddingTop = 50;
-        const paddingLeft = 50;
+    checkGameEndConditions() {
+        if (this.moves >= this.maxMoves) {
+            this.scene.start('LossScene');
+        } else if (this.score >= this.targetScore) {
+            this.scene.start('WinScene');
+        }
+    }
 
-        this.tileContainer = this.add.container(paddingLeft, paddingTop);
+    initFeatures() {
+        this.bombBooster = new BombBooster(this);
+        this.shiftTile = new ShiftTile(this);
+        this.grid = new Grid(this, this.rows, this.cols, this.colors, this.tileSize, this.tileContainer.container);
+        this.initPointerListener();
+    }
 
-        const bgImage = this.add.image(-15, -15, 'game-background');
-        bgImage.setDisplaySize(this.cols * this.tileSize + 30, this.rows * this.tileSize + 30);
-        bgImage.setOrigin(0, 0);
-
-        this.tileContainer.add(bgImage);
-
-        this.grid = new Grid(this, this.rows, this.cols, this.colors, this.tileSize, this.tileContainer);
+    initPointerListener() {
         this.input.on('pointerdown', this.handleClick, this);
     }
 
     handleClick(pointer) {
         if (!this.scene.isActive) return;
 
-        const { x, y } = this.grid.getTileCoordinates.call(this, pointer);
+        const { x, y } = this.grid.getTileCoordinates(pointer);
 
         const tilesToRemove = this.grid.getGroupTiles(x, y);
         if (tilesToRemove && this.bombBooster.isBombActive) {
@@ -78,11 +85,6 @@ export default class GameScene extends Phaser.Scene {
         if (tilesToRemove && tilesToRemove.length >= this.minGroupSize) {
             this.grid.processTileRemoval(tilesToRemove);
         }
-    }
-
-    initFeatures() {
-        this.bombBooster = new BombBooster(this);
-        this.shiftTile = new ShiftTile(this);
     }
 
     createUIComponents() {

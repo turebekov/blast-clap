@@ -32,41 +32,49 @@ class Grid {
         return grid;
     }
 
-    checkTileOnGrid(positionX, positionY) {
-        const tileArray = this.grid[positionX];
+    checkTileOnGrid(positionY, positionX) {
+        const tileArray = this.grid[positionY];
         if (!tileArray) {
             return;
         }
-        if (!tileArray[positionY]) {
+        if (!tileArray[positionX]) {
             return;
         }
-        return tileArray[positionY];
+        return tileArray[positionX];
     }
 
     getGroupTiles(x, y) {
-        const tilesToCheck = [{ x, y }];
         const tilesToRemove = [];
-        const tile = this.checkTileOnGrid(x, y);
+        const tile = this.checkTileOnGrid(y, x);
 
         if (!tile) {
-            return ;
+            return;
         }
-        const color = this.grid[y][x].color;
 
-        while (tilesToCheck.length > 0) {
-            const { x, y } = tilesToCheck.pop();
-
-            if (x >= 0 && x < this.cols && y >= 0 && y < this.rows && this.grid[y][x] && this.grid[y][x].color === color && !tilesToRemove.some(t => t.x === x && t.y === y)) {
-                tilesToRemove.push({ x, y });
-                tilesToCheck.push({ x: x + 1, y });
-                tilesToCheck.push({ x: x - 1, y });
-                tilesToCheck.push({ x, y: y + 1 });
-                tilesToCheck.push({ x, y: y - 1 });
-            }
-        }
+        this.recursiveTileCheck(x, y, tile.color, tilesToRemove);
 
         return tilesToRemove;
     }
+
+    recursiveTileCheck(x, y, color, tilesToRemove) {
+        if (x < 0 || x >= this.cols || y < 0 || y >= this.rows) {
+            return;
+        }
+
+        const tile = this.grid[y][x];
+
+        if (!tile || tile.color !== color || tilesToRemove.some(t => t.x === x && t.y === y)) {
+            return;
+        }
+
+        tilesToRemove.push({ x, y });
+
+        this.recursiveTileCheck(x + 1, y, color, tilesToRemove);
+        this.recursiveTileCheck(x - 1, y, color, tilesToRemove);
+        this.recursiveTileCheck(x, y + 1, color, tilesToRemove);
+        this.recursiveTileCheck(x, y - 1, color, tilesToRemove);
+    }
+
 
     removeTiles(tiles) {
         tiles.forEach(tile => {
@@ -80,30 +88,36 @@ class Grid {
 
     fillEmptySpaces() {
         for (let x = 0; x < this.cols; x++) {
-            let emptySpace = 0;
-
-            for (let y = this.rows - 1; y >= 0; y--) {
-                if (this.grid[y][x] === null) {
-                    emptySpace++;
-                } else if (emptySpace > 0) {
-                    const tile = this.grid[y][x];
-                    this.grid[y][x] = null;
-                    this.grid[y + emptySpace][x] = tile;
-
-                    this.scene.tweens.add({
-                        targets: tile.sprite,
-                        y: tile.sprite.y + emptySpace * this.tileSize,
-                        duration: 500,
-                        ease: 'Power2'
-                    });
-
-                    tile.y += emptySpace;
-                }
-            }
-
+            const emptySpace = this.processEmptySpacesInColumn(x);
             this.createNewTilesForEmptySpace(emptySpace, x);
         }
     }
+
+    processEmptySpacesInColumn(x) {
+        let emptySpace = 0;
+
+        for (let y = this.rows - 1; y >= 0; y--) {
+            if (this.grid[y][x] === null) {
+                emptySpace++;
+            } else if (emptySpace > 0) {
+                const tile = this.grid[y][x];
+                this.grid[y][x] = null;
+                this.grid[y + emptySpace][x] = tile;
+
+                this.scene.tweens.add({
+                    targets: tile.sprite,
+                    y: tile.sprite.y + emptySpace * this.tileSize,
+                    duration: 500,
+                    ease: 'Power2'
+                });
+
+                tile.y += emptySpace;
+            }
+        }
+
+        return emptySpace;
+    }
+
 
     createNewTilesForEmptySpace(emptySpace, x) {
         for (let i = 0; i < emptySpace; i++) {
@@ -121,11 +135,9 @@ class Grid {
         }
     }
 
-
-
     getTileCoordinates(pointer) {
-        const localX = pointer.x - this.tileContainer.x;
-        const localY = pointer.y - this.tileContainer.y;
+        const localX = pointer.x - this.container.x;
+        const localY = pointer.y - this.container.y;
         const x = Math.floor(localX / this.tileSize);
         const y = Math.floor(localY / this.tileSize);
         return { x, y };
@@ -139,17 +151,10 @@ class Grid {
         this.scene.updateUI();
         this.scene.time.delayedCall(100, () => {
             this.scene.isActive = true;
-            this.checkGameEndConditions();
+            this.scene.checkGameEndConditions();
         });
     }
 
-    checkGameEndConditions() {
-        if (this.scene.moves >= this.scene.maxMoves) {
-            this.scene.scene.start('LossScene');
-        } else if (this.scene.score >= this.scene.targetScore) {
-            this.scene.scene.start('WinScene');
-        }
-    }
 }
 
 export default Grid;
