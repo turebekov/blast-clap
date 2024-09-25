@@ -75,7 +75,6 @@ class Grid {
         this.recursiveTileCheck(x, y - 1, color, tilesToRemove);
     }
 
-
     removeTiles(tiles) {
         tiles.forEach(tile => {
             const { x, y } = tile;
@@ -83,14 +82,30 @@ class Grid {
             this.grid[y][x] = null;
         });
 
-        this.scene.time.delayedCall(100, () => this.fillEmptySpaces());
+        this.scene.time.delayedCall(1, () => this.fillEmptySpaces());
     }
 
     fillEmptySpaces() {
+        this.isAnimating = true;
+
+        const tweens = [];
+
         for (let x = 0; x < this.cols; x++) {
             const emptySpace = this.processEmptySpacesInColumn(x);
-            this.createNewTilesForEmptySpace(emptySpace, x);
+            const columnTweens = this.createNewTilesForEmptySpace(emptySpace, x);
+            tweens.push(...columnTweens);
         }
+
+        Promise.all(tweens.map(t => {
+            if (t && typeof t.setCallback === 'function') {
+                return new Promise(resolve => t.setCallback('onComplete', resolve));
+            } else {
+                return Promise.resolve(); // Игнорируем неопределённые твины
+            }
+        }))
+            .then(() => {
+                this.isAnimating = false;
+            });
     }
 
     processEmptySpacesInColumn(x) {
@@ -118,21 +133,24 @@ class Grid {
         return emptySpace;
     }
 
-
     createNewTilesForEmptySpace(emptySpace, x) {
+        const tweens = [];
         for (let i = 0; i < emptySpace; i++) {
             const color = this.colors[Math.floor(Math.random() * this.colors.length)];
             const newTile = new Tile(this.scene, x, i - emptySpace, this.tileSize, color);
             this.grid[i][x] = newTile;
             this.container.add(newTile.sprite);
 
-            this.scene.tweens.add({
+            const tween = this.scene.tweens.add({
                 targets: newTile.sprite,
                 y: newTile.sprite.y + emptySpace * this.tileSize,
                 duration: 500,
                 ease: 'Power2'
             });
+
+            tweens.push(tween);
         }
+        return tweens;
     }
 
     getTileCoordinates(pointer) {
@@ -144,15 +162,11 @@ class Grid {
     }
 
     processTileRemoval(tilesToRemove) {
-        this.scene.isActive = false;
+        this.removeTiles(tilesToRemove);
         this.scene.moves++;
         this.scene.score += tilesToRemove.length * 10;
-        this.removeTiles(tilesToRemove);
         this.scene.updateUI();
-        this.scene.time.delayedCall(100, () => {
-            this.scene.isActive = true;
-            this.scene.checkGameEndConditions();
-        });
+        this.scene.checkGameEndConditions();
     }
 
 }

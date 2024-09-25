@@ -42,7 +42,6 @@ export default class GameScene extends Phaser.Scene {
         this.maxMoves = GAME_CONFIG.MAX_MOVES;
         this.maxShiftTilesCount = GAME_CONFIG.MAX_SHIFT_TILES_COUNT;
         this.targetScore = GAME_CONFIG.TARGET_SCORE;
-        this.isActive = true;
 
         this.moves = 0;
         this.score = 0;
@@ -73,7 +72,7 @@ export default class GameScene extends Phaser.Scene {
     }
 
     handleClick(pointer) {
-        if (!this.scene.isActive) return;
+        if (this.grid.isAnimating) return;
 
         const { x, y } = this.grid.getTileCoordinates(pointer);
 
