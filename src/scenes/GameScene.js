@@ -22,14 +22,15 @@ export default class GameScene extends Phaser.Scene {
 
     create() {
         this.initConfig();
-        this.setBackgroundColorToMainCamera();
-
-        this.createTileContainer();
+        this.resetGameState();
+        this.setupScene();
         this.initFeatures();
         this.createUIComponents();
+        this.initPointerListener();
     }
 
-    createTileContainer() {
+    setupScene() {
+        this.cameras.main.setBackgroundColor('#999fa1');
         this.tileContainer = new TileContainer(this);
     }
 
@@ -42,14 +43,13 @@ export default class GameScene extends Phaser.Scene {
         this.maxMoves = GAME_CONFIG.MAX_MOVES;
         this.maxShiftTilesCount = GAME_CONFIG.MAX_SHIFT_TILES_COUNT;
         this.targetScore = GAME_CONFIG.TARGET_SCORE;
+    }
 
+    resetGameState() {
         this.moves = 0;
         this.score = 0;
         this.shiftTilesCount = 0;
-    }
-
-    setBackgroundColorToMainCamera() {
-        this.cameras.main.setBackgroundColor('#999fa1');
+        this.isAnimating = false;
     }
 
     checkGameEndConditions() {
@@ -64,7 +64,6 @@ export default class GameScene extends Phaser.Scene {
         this.bombBooster = new BombBooster(this);
         this.shiftTile = new ShiftTile(this);
         this.grid = new Grid(this, this.rows, this.cols, this.colors, this.tileSize, this.tileContainer.container);
-        this.initPointerListener();
     }
 
     initPointerListener() {
@@ -77,11 +76,15 @@ export default class GameScene extends Phaser.Scene {
         const { x, y } = this.grid.getTileCoordinates(pointer);
 
         const tilesToRemove = this.grid.getGroupTiles(x, y);
-        if (tilesToRemove && this.bombBooster.isBombActive) {
-            this.bombBooster.useBombBooster(x, y);
-            return;
-        }
-        if (tilesToRemove && tilesToRemove.length >= this.minGroupSize) {
+        if (!tilesToRemove) return;
+
+        this.bombBooster.isBombActive
+            ? this.bombBooster.useBombBooster(x, y)
+            : this.processTileSelection(tilesToRemove);
+    }
+
+    processTileSelection(tilesToRemove) {
+        if (tilesToRemove.length >= this.minGroupSize) {
             this.grid.removeTiles(tilesToRemove);
             this.processTileRemoval(tilesToRemove);
         }
