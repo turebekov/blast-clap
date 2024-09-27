@@ -1,4 +1,4 @@
-class Tile {
+export default class Tile {
     constructor(scene, x, y, size, texture) {
         this.scene = scene;
         this.x = x;
@@ -28,5 +28,3 @@ class Tile {
         });
     }
 }
-
-export default Tile;

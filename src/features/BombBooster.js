@@ -33,6 +33,7 @@ export default class BombBooster {
     }
 
     updateScoreAndRemoveTiles(tilesToRemove) {
+        this.scene.moves++;
         this.scene.score += tilesToRemove.length * 10;
         this.scene.updateUI();
         this.scene.grid.removeTiles(tilesToRemove);

@@ -1,7 +1,7 @@
 import Tile from './Tile.js';
 import Phaser from "phaser";
 
-class Grid {
+export default class Grid {
     constructor(scene, rows, cols, colors, tileSize, container) {
         this.scene = scene;
         this.rows = rows;
@@ -96,16 +96,23 @@ class Grid {
             tweens.push(...columnTweens);
         }
 
-        Promise.all(tweens.map(t => {
-            if (t && typeof t.setCallback === 'function') {
-                return new Promise(resolve => t.setCallback('onComplete', resolve));
-            } else {
-                return Promise.resolve(); // Игнорируем неопределённые твины
-            }
-        }))
+        this.waitForTweensToComplete(tweens)
             .then(() => {
                 this.isAnimating = false;
             });
+
+    }
+
+    waitForTweensToComplete(tweens) {
+        return Promise.all(tweens.map(t => this.createTweenPromise(t)));
+    }
+
+    createTweenPromise(tween) {
+        if (tween && typeof tween.setCallback === 'function') {
+            return new Promise(resolve => tween.setCallback('onComplete', resolve));
+        } else {
+            return Promise.resolve();
+        }
     }
 
     processEmptySpacesInColumn(x) {
@@ -161,14 +168,4 @@ class Grid {
         return { x, y };
     }
 
-    processTileRemoval(tilesToRemove) {
-        this.removeTiles(tilesToRemove);
-        this.scene.moves++;
-        this.scene.score += tilesToRemove.length * 10;
-        this.scene.updateUI();
-        this.scene.checkGameEndConditions();
-    }
-
 }
-
-export default Grid;

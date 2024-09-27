@@ -82,8 +82,16 @@ export default class GameScene extends Phaser.Scene {
             return;
         }
         if (tilesToRemove && tilesToRemove.length >= this.minGroupSize) {
-            this.grid.processTileRemoval(tilesToRemove);
+            this.grid.removeTiles(tilesToRemove);
+            this.processTileRemoval(tilesToRemove);
         }
+    }
+
+    processTileRemoval(tilesToRemove) {
+        this.moves++;
+        this.score += tilesToRemove.length * 10;
+        this.updateUI();
+        this.checkGameEndConditions();
     }
 
     createUIComponents() {

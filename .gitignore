@@ -1,6 +1,7 @@
 .idea/
 node_modules/
 public/
+dist/
 
 # Logs
 logs
