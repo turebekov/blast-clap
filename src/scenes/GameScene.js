@@ -22,7 +22,7 @@ export default class GameScene extends Phaser.Scene {
 
     create() {
         this.initConfig();
-        this.resetGameState();
+        this.initGameState();
         this.setupScene();
         this.initFeatures();
         this.createUIComponents();
@@ -35,17 +35,12 @@ export default class GameScene extends Phaser.Scene {
     }
 
     initConfig() {
-        this.rows = GAME_CONFIG.ROWS;
-        this.cols = GAME_CONFIG.COLS;
-        this.tileSize = GAME_CONFIG.TILE_SIZE;
-        this.colors = GAME_CONFIG.COLORS;
-        this.minGroupSize = GAME_CONFIG.MIN_GROUP_SIZE;
         this.maxMoves = GAME_CONFIG.MAX_MOVES;
         this.maxShiftTilesCount = GAME_CONFIG.MAX_SHIFT_TILES_COUNT;
         this.targetScore = GAME_CONFIG.TARGET_SCORE;
     }
 
-    resetGameState() {
+    initGameState() {
         this.moves = 0;
         this.score = 0;
         this.shiftTilesCount = 0;
@@ -63,7 +58,7 @@ export default class GameScene extends Phaser.Scene {
     initFeatures() {
         this.bombBooster = new BombBooster(this);
         this.shiftTile = new ShiftTile(this);
-        this.grid = new Grid(this, this.rows, this.cols, this.colors, this.tileSize, this.tileContainer.container);
+        this.grid = new Grid(this, this.tileContainer.container);
     }
 
     initPointerListener() {
@@ -84,7 +79,7 @@ export default class GameScene extends Phaser.Scene {
     }
 
     processTileSelection(tilesToRemove) {
-        if (tilesToRemove.length >= this.minGroupSize) {
+        if (tilesToRemove.length >= GAME_CONFIG.MIN_GROUP_SIZE) {
             this.grid.removeTiles(tilesToRemove);
             this.processTileRemoval(tilesToRemove);
         }

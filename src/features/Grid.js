@@ -1,14 +1,15 @@
 import Tile from './Tile.js';
-import Phaser from "phaser";
+import Phaser from 'phaser';
+import {GAME_CONFIG} from '../shared/constants/config.constants';
 
 export default class Grid {
-    constructor(scene, rows, cols, colors, tileSize, container) {
+    constructor(scene, container) {
         this.scene = scene;
-        this.rows = rows;
-        this.cols = cols;
-        this.colors = colors;
-        this.tileSize = tileSize;
         this.container = container;
+        this.rows = GAME_CONFIG.ROWS;
+        this.cols = GAME_CONFIG.COLS;
+        this.colors = GAME_CONFIG.COLORS;
+        this.tileSize = GAME_CONFIG.TILE_SIZE;
 
         this.grid = this.createGrid();
     }

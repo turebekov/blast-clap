@@ -1,6 +1,11 @@
+import {GAME_CONFIG} from '../shared/constants/config.constants';
+
 export default class BombBooster {
     constructor(scene) {
         this.scene = scene;
+        this.rows = GAME_CONFIG.ROWS;
+        this.cols = GAME_CONFIG.COLS;
+
         this.isBombActive = false;
         this.bombRadius = 2;
     }
@@ -23,7 +28,7 @@ export default class BombBooster {
                 const newX = x + i;
                 const newY = y + j;
 
-                if (newX >= 0 && newX < this.scene.cols && newY >= 0 && newY < this.scene.rows) {
+                if (newX >= 0 && newX < this.cols && newY >= 0 && newY < this.rows) {
                     tilesToRemove.push({ x: newX, y: newY });
                 }
             }

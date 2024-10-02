@@ -1,3 +1,5 @@
+import {GAME_CONFIG} from '../shared/constants/config.constants';
+
 export default class TileContainer {
     constructor(scene) {
         this.scene = scene;
@@ -15,7 +17,7 @@ export default class TileContainer {
 
     addBackgroundImageToContainer() {
         const bgImage = this.scene.add.image(-15, -15, 'game-background');
-        bgImage.setDisplaySize(this.scene.cols * this.scene.tileSize + 30, this.scene.rows * this.scene.tileSize + 30);
+        bgImage.setDisplaySize(GAME_CONFIG.COLS * GAME_CONFIG.TILE_SIZE + 30, GAME_CONFIG.ROWS * GAME_CONFIG.TILE_SIZE + 30);
         bgImage.setOrigin(0, 0);
 
         this.container.add(bgImage);
